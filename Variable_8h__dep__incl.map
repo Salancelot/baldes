@@ -1,0 +1,21 @@
+<map id="Variable.h" name="Variable.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="149,5,228,31"/>
+<area shape="rect" id="Node000002" href="$LinExp_8h.html" title=" " alt="" coords="117,79,188,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,46,161,80,156,77,173,43"/>
+<area shape="rect" id="Node000021" href="$MIPHandler_8h.html" title=" " alt="" coords="182,226,282,252"/>
+<area shape="poly" id="edge12_Node000001_Node000021" title=" " alt="" coords="196,45,233,226,227,227,191,46"/>
+<area shape="rect" id="Node000003" href="$Constraint_8h.html" title=" " alt="" coords="76,153,167,178"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="135,119,122,153,117,151,130,117"/>
+<area shape="poly" id="edge11_Node000002_Node000021" title=" " alt="" coords="168,117,228,225,223,227,164,119"/>
+<area shape="poly" id="edge6_Node000003_Node000002" title=" " alt="" coords="139,138,152,104,157,106,144,140"/>
+<area shape="rect" id="Node000004" href="$Cut_8h.html" title="This file contains the definition of the Cut struct and CutStorage class." alt="" coords="5,226,57,252"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="96,190,48,228,45,224,93,186"/>
+<area shape="rect" id="Node000019" href="$Dual_8h.html" title=" " alt="" coords="134,300,192,326"/>
+<area shape="poly" id="edge4_Node000003_Node000019" title=" " alt="" coords="132,192,162,299,157,300,127,194"/>
+<area shape="rect" id="Node000012" href="$Node_8h.html" title="Node class implementation." alt="" coords="132,374,194,399"/>
+<area shape="poly" id="edge10_Node000003_Node000012" title=" " alt="" coords="120,194,116,255,118,290,126,325,138,351,154,371,150,375,134,353,120,327,113,291,111,255,115,193"/>
+<area shape="poly" id="edge7_Node000003_Node000021" title=" " alt="" coords="154,185,215,223,212,228,152,189"/>
+<area shape="poly" id="edge5_Node000019_Node000012" title=" " alt="" coords="166,341,166,373,160,373,160,341"/>
+<area shape="poly" id="edge8_Node000021_Node000019" title=" " alt="" coords="212,265,177,301,173,298,209,261"/>
+<area shape="poly" id="edge9_Node000021_Node000012" title=" " alt="" coords="228,268,207,327,175,375,171,372,202,324,223,266"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="BNBNode::enforceBranching" name="BNBNode::enforceBranching">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,193,56"/>
+<area shape="rect" id="Node000002" href="$classBNBNode.html#aca9f19e12c3b9c992faec5f9370a92fe" title=" " alt="" coords="241,5,465,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,31,225,28,225,34,193,37"/>
+<area shape="rect" id="Node000003" href="$classBranchingDuals.html#a51500cc987ad44e00aa525379b72fa1f" title=" " alt="" coords="254,55,452,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="193,50,239,54,238,59,193,55"/>
+</map>

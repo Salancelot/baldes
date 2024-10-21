@@ -1,0 +1,18 @@
+<map id="BNBNode::chgCoeff" name="BNBNode::chgCoeff">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,112,143,137"/>
+<area shape="rect" id="Node000002" href="$classMIPProblem.html#af77d84a36fde97467ad7069ea2a230f8" title=" " alt="" coords="191,112,341,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,122,175,122,175,127,143,127"/>
+<area shape="rect" id="Node000003" href="$classLinearExpression.html#a931036cafcd17fe3553ffd79468da49e" title=" " alt="" coords="416,5,564,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="288,109,334,83,388,57,406,49,408,54,390,61,336,88,291,113"/>
+<area shape="rect" id="Node000004" href="$classbaldes_1_1Constraint.html#a93386fc562d8fdaba75f04f940000852" title=" " alt="" coords="428,71,552,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="341,111,412,100,413,105,342,116"/>
+<area shape="rect" id="Node000005" href="$structSparseMatrix.html#adc8a18b61890921ed7f6321ff48a791d" title=" " alt="" coords="420,136,561,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="342,132,405,141,404,147,341,138"/>
+<area shape="rect" id="Node000008" href="$classLinearExpression.html#a055d01a2c6ce59aad0e6ec6595159ed8" title=" " alt="" coords="389,201,591,226"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="290,135,335,161,390,186,413,194,411,199,388,191,333,165,288,140"/>
+<area shape="rect" id="Node000006" href="$structSparseMatrix.html#ab07cd94bee1d7f2387e8abe437478cdf" title=" " alt="" coords="639,118,775,144"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="561,145,624,138,624,143,561,151"/>
+<area shape="rect" id="Node000007" href="$structSparseMatrix.html#ad1a2ceb5c4b1170f4ba4219200066004" title=" " alt="" coords="823,144,1008,169"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="561,154,807,154,807,159,561,159"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="775,137,808,141,807,146,775,142"/>
+</map>
