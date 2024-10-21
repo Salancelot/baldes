@@ -142,7 +142,7 @@ public:
         the45selectedNodes      = selectHighestCoefficients(x, max_important_nodes);
     }
 
-    std::pair<bool, bool> runSeparation(BNBNode *node, std::vector<Constraint *> &SRCconstraints);
+    std::pair<bool, bool> runSeparation(BNBNode *node, std::vector<baldes::Constraint *> &SRCconstraints);
 
     using ViolatedCut = std::pair<double, Cut>;
     // Custom comparator to compare only the first element (the violation)

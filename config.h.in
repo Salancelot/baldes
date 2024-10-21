@@ -31,8 +31,9 @@
 #cmakedefine PSTEP
 #cmakedefine SCHRODINGER
 #cmakedefine JEMALLOC
-#cmakedefine GUROBI
-#cmakedefine HIGHS
+// #cmakedefine GUROBI
+// #cmakedefine HIGHS
+#cmakedefine COPT
 #cmakedefine NSYNC
 #cmakedefine CHOLMOD
 

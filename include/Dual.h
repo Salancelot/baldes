@@ -89,7 +89,7 @@ class BranchingDuals {
 public:
     std::vector<VRPCandidate *> getBranchingCandidates() { return branchingCandidates_; }
 
-    void addCandidate(VRPCandidate *candidate, Constraint &constraint) {
+    void addCandidate(VRPCandidate *candidate, baldes::Constraint &constraint) {
         branchingCandidates_.push_back(candidate);
         branchingConstraints_.push_back(constraint);
     }
@@ -136,7 +136,7 @@ public:
 
 private:
     std::vector<VRPCandidate *> branchingCandidates_;
-    std::vector<Constraint>     branchingConstraints_;
+    std::vector<baldes::Constraint>     branchingConstraints_;
     ArcDuals                    arcDuals_;
     NodeDuals                   nodeDuals_;
 };

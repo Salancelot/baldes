@@ -54,15 +54,15 @@ void MIPProblem::addVars(const double *lb, const double *ub, const double *obj, 
     }
 }
 
-Constraint *LinearExpression::operator>=(double rhs) const {
-    auto ctr = new Constraint(*this, rhs, '>'); // '>' represents '>='
+baldes::Constraint *LinearExpression::operator>=(double rhs) const {
+    auto ctr = new baldes::Constraint(*this, rhs, '>'); // '>' represents '>='
     return ctr;
 }
-Constraint *LinearExpression::operator<=(double rhs) const {
-    auto ctr = new Constraint(*this, rhs, '<'); // '<' represents '<='
+baldes::Constraint *LinearExpression::operator<=(double rhs) const {
+    auto ctr = new baldes::Constraint(*this, rhs, '<'); // '<' represents '<='
     return ctr;
 }
-Constraint *LinearExpression::operator==(double rhs) const {
-    auto ctr = new Constraint(*this, rhs, '='); // '=' represents '=='
+baldes::Constraint *LinearExpression::operator==(double rhs) const {
+    auto ctr = new baldes::Constraint(*this, rhs, '='); // '=' represents '=='
     return ctr;
 }

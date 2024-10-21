@@ -1,27 +1,29 @@
 cmake_minimum_required(VERSION 3.16)
 project(BALDES LANGUAGES C CXX)
 
+# 添加cmake模块路径
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
 # Check if Clang is available
 find_program(CLANG_C_COMPILER clang)
 find_program(CLANG_CXX_COMPILER clang++)
 
-if(CLANG_C_COMPILER AND CLANG_CXX_COMPILER)
-  # Set Clang as the default compiler
-  set(CMAKE_C_COMPILER
-      "${CLANG_C_COMPILER}"
-      CACHE STRING "" FORCE)
-  set(CMAKE_CXX_COMPILER
-      "${CLANG_CXX_COMPILER}"
-      CACHE STRING "" FORCE)
-  message(STATUS "Clang found: using Clang as the default compiler")
-else()
-  message(STATUS "Clang not found: using default compiler")
-endif()
+if (CLANG_C_COMPILER AND CLANG_CXX_COMPILER)
+    # Set Clang as the default compiler
+    set(CMAKE_C_COMPILER
+            "${CLANG_C_COMPILER}"
+            CACHE STRING "" FORCE)
+    set(CMAKE_CXX_COMPILER
+            "${CLANG_CXX_COMPILER}"
+            CACHE STRING "" FORCE)
+    message(STATUS "Clang found: using Clang as the default compiler")
+else ()
+    message(STATUS "Clang not found: using default compiler")
+endif ()
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     string(REPLACE "-fconcepts-diagnostics-depth=10" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-endif()
-
+endif ()
 # C++ standard
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -33,26 +35,28 @@ set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API_BOTH TRUE)
 
 # Include directories
 include_directories(include)
-include_directories(include/bucket)
 include_directories(include/algebra)
+include_directories(include/bnb)
+include_directories(include/bucket)
 include_directories(include/cuts)
 include_directories(include/extra)
+include_directories(include/solvers)
 include_directories(include/utils)
 include_directories(third_party/hgs_vrptw)
 
 # Build types and flags
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE
-      "Debug"
-      CACHE STRING "Choose the type of build." FORCE)
-endif()
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE
+            "Debug"
+            CACHE STRING "Choose the type of build." FORCE)
+endif ()
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -flto")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -march=native -flto")
 set(CMAKE_CXX_FLAGS_DEBUG "-Og -g -Wall -Wextra")
 
-if(APPLE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-endif()
+if (APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+endif ()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -84,7 +88,8 @@ option(CLIQUER "Enable Cliquer compilation option" OFF)
 option(VERBOSE "Enable verbose output" OFF)
 option(JEMALLOC "Enable jemalloc" ON)
 option(GUROBI "Enable GUROBI" OFF)
-option(HIGHS "Enable HIGHS" ON)
+option(COPT "Enable COPT" ON)
+option(HIGHS "Enable HIGHS" OFF)
 option(NSYNC "Enable nsync" OFF)
 option(CHOLMOD "Enable cholmod" OFF)
 
@@ -245,6 +250,7 @@ endif()
 # include ankerl
 include_directories(${ankerl_unordered_dense_SOURCE_DIR}/include)
 
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} /home/linuxbrew/.linuxbrew/opt/fmt/)
 find_package(FMT)
 if(NOT FMT_FOUND)
   message(STATUS "FMT not found, using bundled version")
@@ -294,9 +300,10 @@ if(WITH_PYTHON)
   cpmaddpackage(NAME pybind11 GITHUB_REPOSITORY pybind/pybind11 GIT_TAG v2.13.6)
 endif()
 
-set(GUROBI_HOME $ENV{GUROBI_HOME})
-include_directories(${GUROBI_HOME}/include)
-
+if (GUROBI)
+    set(GUROBI_HOME $ENV{GUROBI_HOME})
+    include_directories(${GUROBI_HOME}/include)
+endif ()
 # Source files
 set(SOURCES src/BucketGraph.cpp src/MIPHandler.cpp)
 
@@ -361,6 +368,14 @@ add_executable(vrptw examples/VRPTW.cpp ${EXECUTABLE_SOURCES})
 # Linking libraries
 target_link_libraries(vrptw PRIVATE STDEXEC::stdexec)
 
+if (COPT)
+    # 添加 COPT
+    find_package(COPT REQUIRED)
+    target_include_directories(vrptw PRIVATE ${COPT_INCLUDE_DIRS})
+    target_link_libraries(vrptw PRIVATE ${COPT_LIBRARIES})
+endif ()
+
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} /home/linuxbrew/.linuxbrew/opt/fmt/)
 find_package(FMT)
 if(NOT FMT_FOUND)
   message(STATUS "FMT not found, using bundled version")
@@ -402,15 +417,16 @@ if(GUROBI)
   endif()
 endif()
 
-if(JEMALLOC)
-  find_library(JEMALLOC_LIBRARY jemalloc)
-  if(JEMALLOC_LIBRARY)
-    message(STATUS "jemalloc found: ${JEMALLOC_LIBRARY}")
-    target_link_libraries(vrptw PRIVATE ${JEMALLOC_LIBRARY})
-  else()
-    message(STATUS "jemalloc not found")
-  endif()
-endif()
+if (JEMALLOC)
+    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} /home/linuxbrew/.linuxbrew/opt/jemalloc/)
+    find_library(JEMALLOC_LIBRARY jemalloc)
+    if (JEMALLOC_LIBRARY)
+        message(STATUS "jemalloc found: ${JEMALLOC_LIBRARY}")
+        target_link_libraries(vrptw PRIVATE ${JEMALLOC_LIBRARY})
+    else ()
+        message(STATUS "jemalloc not found")
+    endif ()
+endif ()
 
 if(HIGHS)
   target_link_libraries(vrptw PRIVATE highs::highs)

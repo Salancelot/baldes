@@ -31,10 +31,12 @@
 
 #include "Definitions.h"
 #include "HGS.h"
-#include "miphandler/MIPHandler.h"
 #include "Reader.h"
 #include "bnb/BNB.h"
 #include "bnb/Node.h"
+#include "miphandler/MIPHandler.h"
+
+#include <iomanip>
 
 #ifdef GUROBI
 #include "gurobi_c++.h"
@@ -162,7 +164,8 @@ int main(int argc, char *argv[]) {
     printBaldes();
 
     // get instance name as the first arg
-    std::string instance_name = argv[1];
+    //std::string instance_name = argv[1];
+    std::string instance_name = "../examples/C203.txt";
 
     print_heur("Initializing heuristic solver for initial solution\n");
 

@@ -12,6 +12,10 @@
 #include "Definitions.h"
 #include "SparseMatrix.h" // Include your SparseMatrix class
 
+#ifdef COPT
+#include "coptcpp_pch.h"
+#endif
+
 #ifdef GUROBI
 #include "gurobi_c++.h"
 #endif
@@ -92,10 +96,10 @@ public:
         }
     }
 
-    Constraint *add_constraint(const LinearExpression &expression, double rhs, char relation) {
+    baldes::Constraint *add_constraint(const LinearExpression &expression, double rhs, char relation) {
         int constraint_index = constraints.size(); // Get the current index
         // Add the constraint to the list of constraints and set its index
-        auto new_constraint = new Constraint(expression, rhs, relation);
+        auto new_constraint = new baldes::Constraint(expression, rhs, relation);
         b_vec.push_back(rhs);
         new_constraint->set_index(constraint_index); // Set the constraint's index
 
@@ -121,7 +125,7 @@ public:
         return new_constraint;
     }
 
-    Constraint *add_constraint(Constraint *constraint, const std::string &name) {
+    baldes::Constraint *add_constraint(baldes::Constraint *constraint, const std::string &name) {
         int constraint_index = constraints.size(); // Get the current index
         constraint->set_index(constraint_index);
         constraint->set_name(name);
@@ -158,7 +162,7 @@ public:
         for (int i = constraint_index; i < constraints.size(); ++i) { constraints[i]->set_index(i); }
     }
 
-    void delete_constraint(Constraint *constraint) { delete_constraint(constraint->index()); }
+    void delete_constraint(baldes::Constraint *constraint) { delete_constraint(constraint->index()); }
 
     void delete_variable(const Variable *variable) {
         // Find the index of the given variable in the variables vector
@@ -200,7 +204,7 @@ public:
         }
 
         // Get the constraint that is being modified
-        Constraint       *constraint = constraints[constraintIndex];
+        baldes::Constraint       *constraint = constraints[constraintIndex];
         LinearExpression &expression = constraint->get_expression();
 
         // Iterate over the values and only update changed entries
@@ -234,7 +238,7 @@ public:
         sparse_matrix.modify_or_delete(constraintIndex, variableIndex, value);
 
         // Update the LinearExpression in the corresponding Constraint
-        Constraint       *constraint = constraints[constraintIndex];
+        baldes::Constraint       *constraint = constraints[constraintIndex];
         LinearExpression &expression = constraint->get_expression();
 
         const std::string &var_name = variables[variableIndex]->get_name();
@@ -255,7 +259,7 @@ public:
     // Get all variables
     std::vector<Variable *> &getVars() { return variables; }
     // Get all constraints
-    std::vector<Constraint *> &getConstraints() { return constraints; }
+    std::vector<baldes::Constraint *> &getConstraints() { return constraints; }
 
     // Method to get the b vector (RHS values of all constraints)
     std::vector<double> get_b_vector() const {
@@ -264,7 +268,7 @@ public:
         return b;
     }
 
-    void chgCoeff(Constraint *constraint, const std::vector<double> &new_coeffs) {
+    void chgCoeff(baldes::Constraint *constraint, const std::vector<double> &new_coeffs) {
         auto constraintIndex = constraint->index();
         // Change the coefficients for the constraint
         chgCoeff(constraintIndex, new_coeffs);
@@ -322,7 +326,7 @@ public:
     }
 
     // Helper function to convert MIP constraints into a Gurobi linear expression
-    GRBLinExpr convertToGurobiExpr(const Constraint                                        *constraint,
+    GRBLinExpr convertToGurobiExpr(const baldes::Constraint                                        *constraint,
                                    const ankerl::unordered_dense::map<std::string, GRBVar> &gurobiVars) {
         GRBLinExpr expr;
         for (const auto &term : constraint->get_terms()) {
@@ -409,6 +413,86 @@ public:
     }
 
 #endif
+
+#ifdef COPT
+    // Function to populate a Copt model from this MIPProblem instance
+    Model toCoptModel(Envr &env) {
+        // Create a new Copt model
+        Model coptModel = env.CreateModel("");
+        coptModel.SetIntParam(COPT_INTPARAM_LOGGING, 0);      // Disable logging
+        coptModel.SetIntParam(COPT_INTPARAM_LOGTOCONSOLE, 0); // Disable console output
+
+        // Map to store Copt variables
+        // TODO(wyb): fixbug
+        std::unordered_map<std::string, int> varIndxByName;
+        VarArray                             coptVars;
+
+        // check if we have repeted variable name
+        std::unordered_map<std::string, int> var_count;
+        for (const auto &var : variables) {
+            if (var_count.find(var->get_name()) == var_count.end()) {
+                var_count[var->get_name()] = 1;
+            } else {
+                var_count[var->get_name()]++;
+                fmt::print("Variable name {} is repeated {} times\n", var->get_name(), var_count[var->get_name()]);
+            }
+        }
+        // Step 1: Add variables to the Copt model
+        int i = 0;
+        for (const auto &var : variables) {
+            // Add each variable to the Copt model, according to its type and bounds
+            coptVars.PushBack(coptModel.AddVar(var->get_lb(), var->get_ub(), var->get_objective_coefficient(),
+                                               toCOPTVarType(var->get_type()), var->get_name().c_str()));
+            varIndxByName[var->get_name()] = i;
+            i++;
+        }
+
+        // Step 2: Add constraints to the Copt model
+        for (const auto &constraint : constraints) {
+            Expr coptExpr = convertToCoptExpr(constraint, varIndxByName, coptVars);
+            if (constraint->get_relation() == '<') {
+                coptModel.AddConstr(coptExpr, 'L', constraint->get_rhs(), constraint->get_name().c_str());
+            } else if (constraint->get_relation() == '>') {
+                coptModel.AddConstr(coptExpr, 'G', constraint->get_rhs(), constraint->get_name().c_str());
+            } else if (constraint->get_relation() == '=') {
+                coptModel.AddConstr(coptExpr, 'E', constraint->get_rhs(), constraint->get_name().c_str());
+            }
+        }
+
+        // Step 3: Set objective if needed (assuming a linear objective function)
+        Expr objective;
+        for (const auto &var : variables) {
+            objective += var->get_objective_coefficient() * coptVars[varIndxByName.at(var->get_name())];
+        }
+        coptModel.SetObjective(objective, COPT_MINIMIZE); // Assume minimization problem
+
+        return coptModel;
+    }
+
+    // Helper function to convert MIP variable type to Copt variable type
+    char toCOPTVarType(VarType varType) {
+        switch (varType) {
+        case VarType::Continuous: return COPT_CONTINUOUS;
+        case VarType::Integer: return COPT_INTEGER;
+        case VarType::Binary: return COPT_BINARY;
+        default: throw std::invalid_argument("Unknown variable type");
+        }
+    }
+
+    // Helper function to convert MIP constraints into a Gurobi linear expression
+    Expr convertToCoptExpr(const baldes::Constraint                   *constraint,
+                           const std::unordered_map<std::string, int> &varIndxByName, VarArray &coptVars) {
+        Expr expr;
+        for (const auto &term : constraint->get_terms()) {
+            const std::string &varName = term.first;
+            double             coeff   = term.second;
+            int                idx     = varIndxByName.at(varName);
+            expr += coptVars[idx] * coeff;
+        }
+        return expr;
+    }
+#endif
+
 
     void update() { sparse_matrix.buildRowStart(); }
 
@@ -501,7 +585,7 @@ public:
 private:
     std::string                                    name;
     std::vector<Variable *>                        variables;
-    std::vector<Constraint *>                      constraints;    // Store the constraints
+    std::vector<baldes::Constraint *>                      constraints;    // Store the constraints
     LinearExpression                               objective;      // Store the objective function
     ObjectiveType                                  objective_type; // Minimize or Maximize
     SparseMatrix                                   sparse_matrix;  // Use SparseMatrix for coefficient storage

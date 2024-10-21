@@ -43,7 +43,7 @@ public:
     }
 
     // Register a deferred action (e.g., a callback or lambda)
-    void register_deferred_action(std::move_only_function<void()> action) {
+    void register_deferred_action(std::function<void()> action) {
         deferred_actions.push_back(std::move(action)); // Store the move-only function
     }
 
@@ -85,7 +85,7 @@ private:
     std::vector<void *> free_list; // Vector-based free list for better cache locality
 
     // Deferred actions stored in the memory pool
-    std::vector<std::move_only_function<void()>> deferred_actions;
+    std::vector<std::function<void()>> deferred_actions;
 
     // Initialize the pool and populate the free list with pointers to available blocks
     void initialize_pool() {

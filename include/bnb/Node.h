@@ -40,6 +40,10 @@
 
 #include "miphandler/MIPHandler.h"
 
+#ifdef COPT
+#include "solvers/Copt.h"
+#endif
+
 #ifdef GUROBI
 #include "gurobi_c++.h"
 #include "gurobi_c.h"
@@ -94,7 +98,7 @@ public:
 
 // node specific
 #ifdef SRC
-    std::vector<Constraint *> SRCconstraints;
+    std::vector<baldes::Constraint *> SRCconstraints;
     LimitedMemoryRank1Cuts    r1c;
 #endif
 
@@ -117,6 +121,11 @@ public:
 
     explicit BNBNode(const MIPProblem &eModel) {
         mip = eModel;
+
+#ifdef COPT
+        auto copt_model = mip.toCoptModel(CoptEnvSingleton::getInstance());
+        solver          = new CoptSolver(copt_model);
+#endif
 
 #ifdef HIGHS
         auto highsmodel = mip.toHighsModel();
@@ -229,7 +238,7 @@ public:
 
     // Change multiple coefficients for a specific constraint
     void chgCoeff(int constraintIndex, const std::vector<double> &values) { mip.chgCoeff(constraintIndex, values); }
-    void chgCoeff(Constraint *ctr, const std::vector<double> &values) { mip.chgCoeff(ctr, values); }
+    void chgCoeff(baldes::Constraint *ctr, const std::vector<double> &values) { mip.chgCoeff(ctr, values); }
 
     // Change a single coefficient for a specific constraint and variable
     void chgCoeff(int constraintIndex, int variableIndex, double value) {
@@ -238,6 +247,8 @@ public:
 
     double getSlack(int constraintIndex, const std::vector<double> &solution) {
 #if defined(GUROBI)
+        return solver->getSlack(constraintIndex);
+#elif defined(COPT)
         return solver->getSlack(constraintIndex);
 #else
         return mip.getSlack(constraintIndex, solution);
@@ -257,7 +268,7 @@ public:
         for (auto *var : vars) { var->set_type(VarType::Continuous); }
     }
 
-    void remove(Constraint *ctr) { mip.delete_constraint(ctr); }
+    void remove(baldes::Constraint *ctr) { mip.delete_constraint(ctr); }
     void remove(Variable *var) { mip.delete_variable(var); }
 
     Variable *addVar(const std::string &name, VarType type, double lb, double ub, double obj) {
@@ -285,7 +296,7 @@ public:
     void setIntAttr(const std::string &attr, int value) { throw std::invalid_argument("Unknown attribute"); }
     void setDoubleAttr(const std::string &attr, double value) { throw std::invalid_argument("Unknown attribute"); }
 
-    Constraint *addConstr(Constraint *ctr, const std::string &name) {
+    baldes::Constraint *addConstr(baldes::Constraint *ctr, const std::string &name) {
         ctr = mip.add_constraint(ctr, name);
         return ctr;
     }
@@ -297,7 +308,7 @@ public:
     Variable *getVar(int i) { return mip.getVar(i); }
 
     // Get all constraints
-    std::vector<Constraint *> &getConstrs() { return mip.getConstraints(); }
+    std::vector<baldes::Constraint *> &getConstrs() { return mip.getConstraints(); }
 
     ModelData extractModelDataSparse() { return mip.extractModelDataSparse(); }
 
@@ -316,6 +327,12 @@ public:
 #ifdef GUROBI
         GRBEnv &env   = GurobiEnvSingleton::getInstance();
         auto    model = new GRBModel(mip.toGurobiModel(env)); // Pass the retrieved or new environment
+        solver->setModel(model);
+#endif
+
+#ifdef COPT
+        Envr &env   = CoptEnvSingleton::getInstance();
+        auto  model = new Model(mip.toCoptModel(env));
         solver->setModel(model);
 #endif
         solver->optimize(tol);
@@ -345,7 +362,7 @@ public:
 
     std::vector<BranchingQueueItem> historyCandidates;
 
-    Constraint addBranchingConstraint(double rhs, const BranchingDirection &sense, const CandidateType &ctype,
+    baldes::Constraint addBranchingConstraint(double rhs, const BranchingDirection &sense, const CandidateType &ctype,
                                       std::optional<std::variant<int, std::pair<int, int>>> payload = std::nullopt) {
         /*
                 // Get the decision variables from the model
@@ -402,7 +419,7 @@ public:
 
                 return constraint;
                 */
-        return Constraint();
+        return {};
     }
 
     BranchingDuals branchingDuals;
@@ -410,7 +427,7 @@ public:
     void enforceBranching() {
         // Iterate over the candidates and enforce the branching constraints
         for (const auto &candidate : candidates) {
-            Constraint ctr = addBranchingConstraint(candidate->boundValue, candidate->boundType,
+            baldes::Constraint ctr = addBranchingConstraint(candidate->boundValue, candidate->boundType,
                                                     candidate->candidateType, candidate->payload);
             branchingDuals.addCandidate(candidate, ctr);
         }

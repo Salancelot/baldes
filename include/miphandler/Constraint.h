@@ -10,7 +10,7 @@
 #pragma once
 #include "LinExp.h"
 #include "ankerl/unordered_dense.h"
-
+namespace baldes {
 /**
  * @class Constraint
  * @brief Represents a linear constraint in a mathematical optimization problem.
@@ -50,3 +50,4 @@ private:
     int              indice;
     std::string      name;
 };
+} // namespace baldes

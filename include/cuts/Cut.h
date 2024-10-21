@@ -37,9 +37,7 @@ struct SRCPermutation {
     void swap(SRCPermutation &other) {
 
         // Swap each corresponding element in the num and den vectors
-        for (size_t i = 0; i < num.size(); ++i) {
-            std::swap(num[i], other.num[i]);
-        }
+        for (size_t i = 0; i < num.size(); ++i) { std::swap(num[i], other.num[i]); }
         std::swap(den, other.den);
     }
 
@@ -63,13 +61,13 @@ struct Cut {
     std::vector<double>             coefficients; // Cut coefficients
     SRCPermutation                  p = {{1, 1, 1, 1, 1}, 2};
 
-    double      rhs     = 1;
-    int         id      = -1;
-    bool        added   = false;
-    bool        updated = false;
-    CutType     type    = CutType::ThreeRow;
-    Constraint *grbConstr;
-    size_t      key;
+    double              rhs     = 1;
+    int                 id      = -1;
+    bool                added   = false;
+    bool                updated = false;
+    CutType             type    = CutType::ThreeRow;
+    baldes::Constraint *grbConstr;
+    size_t              key;
     // Default constructor
     Cut() = default;
 
@@ -120,7 +118,7 @@ public:
         SRCDuals = {};
     }
 
-    Cut &getCut(int cutIndex) { return cuts[cutIndex]; }
+    Cut       &getCut(int cutIndex) { return cuts[cutIndex]; }
     const Cut &getCut(int cutIndex) const { return cuts[cutIndex]; }
 
     int getID(int cutIndex) { return cuts[cutIndex].id; }

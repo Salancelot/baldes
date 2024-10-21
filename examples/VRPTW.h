@@ -291,7 +291,7 @@ public:
      * Handles the cuts for the VRPTW problem.
      *
      */
-    bool cutHandler(LimitedMemoryRank1Cuts &r1c, BNBNode *node, std::vector<Constraint *> &constraints) {
+    bool cutHandler(LimitedMemoryRank1Cuts &r1c, BNBNode *node, std::vector<baldes::Constraint *> &constraints) {
         auto &cuts    = r1c.cutStorage;
         bool  changed = false;
 
@@ -342,7 +342,7 @@ public:
      * @return True if any RCCs were added, false otherwise.
      */
     bool exactRCCsep(GRBModel *model, const std::vector<double> &solution,
-                     std::vector<std::vector<std::vector<Constraint>>> &constraints) {
+                     std::vector<std::vector<std::vector<baldes::Constraint>>> &constraints) {
 
         auto Ss = separate_Rounded_Capacity_cuts(model, instance.q, instance.demand, allPaths, solution);
 
@@ -382,7 +382,7 @@ public:
             arcGroups[c]      = std::move(arcs);
         }
 
-        // std::vector<Constraint> newConstraints(cutExpressions.size());
+        // std::vector<baldes::Constraint> newConstraints(cutExpressions.size());
         for (size_t i = 0; i < cutExpressions.size(); ++i) {
             auto ctr = model->addConstr(cutExpressions[i] <= rhsValues[i]);
             rccManager.addCut(arcGroups[i], rhsValues[i], ctr);

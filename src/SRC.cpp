@@ -383,7 +383,7 @@ void LimitedMemoryRank1Cuts::generateCutCoefficients(VRPTW_SRC &cuts, std::vecto
     }
 }
 
-std::pair<bool, bool> LimitedMemoryRank1Cuts::runSeparation(BNBNode *node, std::vector<Constraint *> &SRCconstraints) {
+std::pair<bool, bool> LimitedMemoryRank1Cuts::runSeparation(BNBNode *node, std::vector<baldes::Constraint *> &SRCconstraints) {
     node->optimize();
     auto      solution = node->extractSolution();
     auto      cuts     = &cutStorage;
@@ -398,7 +398,7 @@ std::pair<bool, bool> LimitedMemoryRank1Cuts::runSeparation(BNBNode *node, std::
     // Iterate over the constraints in reverse order to remove non-violated cuts
     // sort SRCconstraints by index
     std::sort(SRCconstraints.begin(), SRCconstraints.end(),
-              [](const Constraint *a, const Constraint *b) { return a->index() < b->index(); });
+              [](const baldes::Constraint *a, const baldes::Constraint *b) { return a->index() < b->index(); });
 
     //if (cleared) node->optimize();
     matrix   = node->extractModelDataSparse(); // Extract model data

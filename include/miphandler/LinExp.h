@@ -9,6 +9,7 @@
  *
  */
 #pragma once
+#include "Constraint.h"
 #include "Variable.h"
 #include <iostream>
 #include <string>
@@ -17,9 +18,9 @@
 #include <vector>
 
 #include "ankerl/unordered_dense.h"
-
+namespace baldes {
 class Constraint;
-
+}
 /**
  * @class LinearExpression
  * @brief Represents a linear expression in a mathematical optimization problem.
@@ -33,7 +34,7 @@ public:
 
     // Add a term to the expression
     LinearExpression &operator+=(const std::pair<Variable *, double> &term) {
-        if (term.second != 0.0) {                        // Skip zero coefficients
+        if (term.second != 0.0) {                         // Skip zero coefficients
             terms[term.first->get_name()] += term.second; // Accumulate coefficients for the same variable
         }
         return *this;
@@ -41,7 +42,7 @@ public:
 
     // Add a term to the expression
     LinearExpression &operator+=(const std::pair<Variable *, int> &term) {
-        if (term.second != 0.0) {                        // Skip zero coefficients
+        if (term.second != 0.0) {                         // Skip zero coefficients
             terms[term.first->get_name()] += term.second; // Accumulate coefficients for the same variable
         }
         return *this;
@@ -80,13 +81,13 @@ public:
     void add_or_update_term(const std::string &var_name, double coeff) { terms[var_name] = coeff; }
 
     // Overload for <= operator
-    Constraint *operator<=(double rhs) const;
+    baldes::Constraint *operator<=(double rhs) const;
 
     // Overload for >= operator
-    Constraint *operator>=(double rhs) const;
+    baldes::Constraint *operator>=(double rhs) const;
 
     // Overload for == operator
-    Constraint *operator==(double rhs) const;
+    baldes::Constraint *operator==(double rhs) const;
 
 private:
     ankerl::unordered_dense::map<std::string, double> terms; // Map of variable name to coefficient
